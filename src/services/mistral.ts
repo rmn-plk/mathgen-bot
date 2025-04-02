@@ -1,5 +1,4 @@
 import { Mistral } from "@mistralai/mistralai";
-import { saveFile } from "./files";
 
 var mistral: Mistral;
 
@@ -26,9 +25,6 @@ async function recognizeFile(fileUrl: string, isImage: boolean) {
   const extractedText = ocrResponse.pages
     .map((page) => page.markdown)
     .join("\n");
-  const timestamp = Date.now();
-  const mdFileName = `ocr_${timestamp}.md`;
-  const filePath = await saveFile(mdFileName, extractedText);
-  return filePath;
+  return extractedText;
 }
 export { initMistral, recognizeFile };

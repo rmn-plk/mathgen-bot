@@ -1,4 +1,5 @@
 import fs from "fs";
+import { access, mkdir } from "fs/promises";
 import { join } from "path";
 import { UPLOAD_DIR } from "../constants";
 function uploadPath(name: string) {
@@ -17,4 +18,12 @@ function readFile(name: string) {
   return fs.readFileSync(filePath);
 }
 
-export { saveFile, readFile, uploadPath };
+async function ensureDirExists (dirPath: string) {
+  try {
+    await access(dirPath);
+  } catch {
+    await mkdir(dirPath, { recursive: true });
+  }
+};
+
+export { saveFile, readFile, uploadPath, ensureDirExists };

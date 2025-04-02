@@ -1,16 +1,19 @@
 import { Bot, Context, InputFile } from "grammy";
 import { FileFlavor, hydrateFiles } from "@grammyjs/files";
 import { recognizeFile } from "./mistral";
-import { uploadPath } from "./files";
+import { uploadPath, saveFile, ensureDirExists } from "./files";
 import convertFile from "./pandoc";
+import { UPLOAD_DIR } from "../constants";
 
 type FileContext = FileFlavor<Context>;
 var bot: Bot<FileContext>;
 
 async function processFile(ctx: Context, isImage: boolean) {
   try {
+    const userDir = ctx.me.id;
     const timestamp = Date.now();
-    const docxFilePath = uploadPath(`ocr_${timestamp}.docx`);
+    const docxFilePath = uploadPath(`${userDir}/${timestamp}.docx`);
+    const mdFileName = `${userDir}/${timestamp}.md`;
     const file = await ctx.getFile();
     const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
@@ -18,7 +21,8 @@ async function processFile(ctx: Context, isImage: boolean) {
       "Recognizing math in the file..."
     );
 
-    const filePath = await recognizeFile(fileUrl, isImage);
+    const extractedText = await recognizeFile(fileUrl, isImage);
+    const filePath = await saveFile(mdFileName, extractedText);
     await ctx.api.editMessageText(
       recognizingMessage.chat.id,
       recognizingMessage.message_id,
@@ -43,13 +47,16 @@ async function processFile(ctx: Context, isImage: boolean) {
 }
 
 async function initBot() {
-  bot = new Bot<FileContext>(process.env.BOT_TOKEN!)
+  bot = new Bot<FileContext>(process.env.BOT_TOKEN!);
   bot.api.config.use(hydrateFiles(bot.token));
 
-  bot.command("start", (ctx: Context) => ctx.reply("Welcome! Up and running."));
+  bot.command("start", async (ctx: Context) => {
+    await ensureDirExists(`${UPLOAD_DIR}/${ctx.me.id}`);
+    ctx.reply("Welcome! Up and running.");
+  });
 
-  bot.command("help", async (ctx: Context) => {
-    await ctx.reply("Please send a PDF, PNG, or JPG file.");
+  bot.command("help", (ctx: Context) => {
+    ctx.reply("Please send a PDF, PNG, or JPG file.");
   });
 
   bot.on(":document", async (ctx: Context) => {
