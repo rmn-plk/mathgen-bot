@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc ./build/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@grammyjs/files": "^1.1.1",
+    "@mistralai/mistralai": "^1.5.2",
+    "dotenv": "^16.4.7",
+    "grammy": "^1.35.1"
+  }
+}
