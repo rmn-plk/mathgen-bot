@@ -5,7 +5,7 @@ import { promisify } from 'util';
 
 const statAsync = promisify(fs.stat);
 
-const convert = (src: string, args: string | string[], options?: Array<string>): Promise<string | boolean> => {
+const convertFile = (src: string, args: string | string[], options?: Array<string>): Promise<string | boolean> => {
   return new Promise((resolve, reject) => {
     let result = "";
     let pdSpawn: ChildProcess;
@@ -46,4 +46,4 @@ const convert = (src: string, args: string | string[], options?: Array<string>):
   });
 };
 
-export default convert;
+export default convertFile;
