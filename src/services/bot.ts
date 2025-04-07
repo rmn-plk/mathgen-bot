@@ -9,11 +9,13 @@ type FileContext = FileFlavor<Context>;
 var bot: Bot<FileContext>;
 
 async function processFile(ctx: Context, isImage: boolean) {
+  const userDir = ctx.me.id;
+  const timestamp = Date.now();
+  const fileName = `${userDir}/${timestamp}`;
+  const markdownFilePath: string = uploadPath(`${fileName}.md`),
+  docxFilePath = uploadPath(`${fileName}.docx`);;
+
   try {
-    const userDir = ctx.me.id;
-    const timestamp = Date.now();
-    const docxFilePath = uploadPath(`${userDir}/${timestamp}.docx`);
-    const mdFileName = `${userDir}/${timestamp}.md`;
     const file = await ctx.getFile();
     const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
@@ -22,7 +24,8 @@ async function processFile(ctx: Context, isImage: boolean) {
     );
 
     const extractedText = await recognizeFile(fileUrl, isImage);
-    const markdownFilePath = await saveFile(mdFileName, extractedText);
+
+    await saveFile(`${fileName}.md`, extractedText);
     await ctx.api.editMessageText(
       recognizingMessage.chat.id,
       recognizingMessage.message_id,
@@ -39,14 +42,18 @@ async function processFile(ctx: Context, isImage: boolean) {
       "✔️ Файл сконвертирован!"
     );
 
-    await ctx.replyWithDocument(new InputFile(docxFilePath));
-    if (process.env.DEVELOPMENT !== "true") {
-      await removeFile(docxFilePath);
-      await removeFile(markdownFilePath);
-    }
+    ctx.replyWithDocument(new InputFile(docxFilePath));
   } catch (error) {
     console.error("OCR processing error:", error);
-    await ctx.reply("❌ Бот не смог конвертировать ваш файл");
+    await ctx.reply("❌ Бот не смог cконвертировать ваш файл");
+  }
+  await removeConvertedFiles(markdownFilePath, docxFilePath);
+}
+
+async function removeConvertedFiles(markdownFilePath: string, docxFilePath: string) {
+  if (process.env.DEVELOPMENT !== "true") {
+    await removeFile(docxFilePath);
+    return removeFile(markdownFilePath);
   }
 }
 
@@ -56,6 +63,8 @@ async function initBot() {
 
   bot.command("start", async (ctx: Context) => {
     await ensureDirExists(`${UPLOAD_DIR}/${ctx.me.id}`);
+    await saveFile(`${ctx.me.id}/user.json`, JSON.stringify(ctx.from));
+
     ctx.reply("👋 Добро пожаловать!");
   });
 
