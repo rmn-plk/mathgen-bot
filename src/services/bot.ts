@@ -45,7 +45,7 @@ async function processFile(ctx: Context, isImage: boolean) {
     ctx.replyWithDocument(new InputFile(docxFilePath));
   } catch (error) {
     console.error("OCR processing error:", error);
-    await ctx.reply("❌ Бот не смог cконвертировать ваш файл");
+    await ctx.reply("❌ Не получилось cконвертировать ваш файл");
   }
   await removeConvertedFiles(markdownFilePath, docxFilePath);
 }
@@ -69,7 +69,7 @@ async function initBot() {
   });
 
   bot.command("help", (ctx: Context) => {
-    ctx.reply("🙏🏼 Бот поддерживает конвертацию PDF, PNG, or JPG файлов.");
+    ctx.reply("🙏🏼 Поддерживается конвертация PDF, PNG, or JPG файлов. Максимальный допустимый размер файлов - 20MB.");
   });
 
   bot.command("contact", (ctx: Context) => {
@@ -82,7 +82,7 @@ async function initBot() {
     if (
       !["application/pdf", "image/png", "image/jpeg"].includes(file?.mime_type)
     ) {
-      return ctx.reply("🙏🏼 Бот поддерживает только конвертацию PDF, PNG, or JPG файлов.");
+      return ctx.reply("🙏🏼 Пподдерживается конвертация PDF, PNG, or JPG файлов.");
     }
     await processFile(ctx, false);
   });
