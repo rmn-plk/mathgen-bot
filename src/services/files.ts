@@ -1,5 +1,5 @@
 import fs from "fs";
-import { access, mkdir } from "fs/promises";
+import { access, mkdir, unlink } from "fs/promises";
 import { join } from "path";
 import { UPLOAD_DIR } from "../constants";
 function uploadPath(name: string) {
@@ -20,10 +20,14 @@ function readFile(name: string) {
 
 async function ensureDirExists (dirPath: string) {
   try {
-    await access(dirPath);
+    return access(dirPath);
   } catch {
-    await mkdir(dirPath, { recursive: true });
+    return mkdir(dirPath, { recursive: true });
   }
 };
 
-export { saveFile, readFile, uploadPath, ensureDirExists };
+async function removeFile(filePath: string) {
+  return unlink(filePath);
+}
+
+export { saveFile, readFile, uploadPath, ensureDirExists, removeFile };
