@@ -27,7 +27,7 @@ async function recognizeFile(fileUrl: string, isImage: boolean) {
       page.images?.forEach((image) => {
         const width = Math.abs(image.bottomRightX - image.topLeftX) / 2;
         const height = Math.abs(image.topLeftY - image.bottomRightY) / 2;
-        markdown = markdown.replace(`(${image.id})`, `(${image?.imageBase64}){width=${width}px height=${height}px}`);
+        markdown = markdown.replace(`![${image.id}](${image.id})`, `![](${image?.imageBase64}){width=${width}px height=${height}px}`);
       });
       return markdown;
     })
