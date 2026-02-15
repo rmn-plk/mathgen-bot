@@ -27,4 +27,11 @@ async function removeFile(filePath: string) {
   }
 }
 
-export { saveFile, uploadPath, ensureDirExists, removeFile };
+async function removeConvertedFiles(markdownFilePath: string, docxFilePath: string) {
+  if (process.env.DEVELOPMENT !== "true") {
+    await removeFile(docxFilePath);
+    return removeFile(markdownFilePath);
+  }
+}
+
+export { saveFile, uploadPath, ensureDirExists, removeFile, removeConvertedFiles };
