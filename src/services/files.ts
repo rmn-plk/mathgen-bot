@@ -12,9 +12,9 @@ async function saveFile(name: string, data: string | Buffer) {
 
 async function ensureDirExists(dirPath: string) {
   try {
-    return access(dirPath);
+    await access(dirPath);
   } catch {
-    return mkdir(dirPath, { recursive: true });
+    await mkdir(dirPath, { recursive: true });
   }
 }
 
