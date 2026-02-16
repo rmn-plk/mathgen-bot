@@ -14,7 +14,8 @@ type FileContext = FileFlavor<Context>;
 var bot: Bot<FileContext>;
 
 async function processFile(ctx: Context, isImage: boolean) {
-  const userDir = ctx.me.id;
+  await ensureDirExists(`${UPLOAD_DIR}/${ctx.from.id}`);
+  const userDir = ctx.from.id;
   const timestamp = Date.now();
   const fileName = `${userDir}/${timestamp}`;
   const markdownFilePath: string = uploadPath(`${fileName}.md`),
@@ -73,8 +74,8 @@ async function initBot() {
   bot.api.config.use(hydrateFiles(bot.token));
 
   bot.command("start", async (ctx: Context) => {
-    await ensureDirExists(`${UPLOAD_DIR}/${ctx.me.id}`);
-    await saveFile(`${ctx.me.id}/user.json`, JSON.stringify(ctx.from));
+    await ensureDirExists(`${UPLOAD_DIR}/${ctx.from.id}`);
+    await saveFile(`${ctx.from.id}/user.json`, JSON.stringify(ctx.from));
 
     ctx.reply("👋 Добро пожаловать!");
   });
