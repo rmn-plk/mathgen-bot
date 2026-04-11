@@ -1,0 +1,12 @@
+services:
+  bot:
+    build: .
+    container_name: mathgen-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - bot_uploads:/app/uploads
+
+volumes:
+  bot_uploads:
