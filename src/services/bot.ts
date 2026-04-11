@@ -70,6 +70,7 @@ function checkIfUsageNotAvailable(ctx: Context) {
 }
 
 async function initBot() {
+  console.log(process.env);
   bot = new Bot<FileContext>(process.env.BOT_TOKEN!);
   bot.api.config.use(hydrateFiles(bot.token));
 
