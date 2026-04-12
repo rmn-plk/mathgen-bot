@@ -1,10 +1,9 @@
-FROM node:22-bookworm-slim
+FROM node:24-alpine
 
 WORKDIR /app
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends pandoc \
-  && rm -rf /var/lib/apt/lists/*
+# Install dependencies needed for pandoc and binaries
+RUN apk add --no-cache pandoc
 
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
