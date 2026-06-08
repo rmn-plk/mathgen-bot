@@ -8,7 +8,7 @@ import {
   removeConvertedFiles,
 } from "./files";
 import convertFile from "./pandoc";
-import { UPLOAD_DIR } from "../constants";
+import { UPLOAD_DIR, getTelegramApiRoot } from "../constants";
 
 type FileContext = FileFlavor<Context>;
 var bot: Bot<FileContext>;
@@ -23,7 +23,7 @@ async function processFile(ctx: Context, isImage: boolean) {
 
   try {
     const file = await ctx.getFile();
-    const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+    const fileUrl = `${getTelegramApiRoot()}/file/bot${bot.token}/${file.file_path}`;
 
     const recognizingMessage = await ctx.reply(
       "🔎 Распознавание текста в файле...",
@@ -70,7 +70,9 @@ function checkIfUsageNotAvailable(ctx: Context) {
 }
 
 async function initBot() {
-  bot = new Bot<FileContext>(process.env.BOT_TOKEN!);
+  bot = new Bot<FileContext>(process.env.BOT_TOKEN!, {
+    client: { apiRoot: getTelegramApiRoot() },
+  });
   bot.api.config.use(hydrateFiles(bot.token));
 
   bot.command("start", async (ctx: Context) => {
